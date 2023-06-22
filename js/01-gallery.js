@@ -26,21 +26,26 @@ function onGalleryClick(event) {
     <img class="gallery__modal" src="${event.target.dataset.source}"/>
     </div>` );
   instance.show();
-     
+    
   const galleryModalEl = document.querySelector( '.basicLightbox' );
-  document.addEventListener( 'keydown', (event) => {
+  galleryModalEl.addEventListener( 'click', closeModalClick );
+  window.addEventListener( 'keydown', closeModalEsc );
+
+  function closeModalEsc( event ) {
     if ( event.code !== 'Escape' ) {
       return
     } else {
       instance.close();
+      window.removeEventListener( 'keydown', closeModalEsc );
     }
-  } );
-  galleryModalEl.addEventListener( 'click', closeModal );
-  
-  function closeModal( event ) {
+  };
+
+  function closeModalClick( event ) {
     instance.close();
-  }
+  };
 };
+
+
 
 
 
