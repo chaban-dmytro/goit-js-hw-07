@@ -2,29 +2,37 @@ import { galleryItems } from './gallery-items.js';
 // Change code below this line
 const galleryEl = document.querySelector( '.gallery' );
 
-const galleryItemsArray = [];
+const galleryArray = galleryItems.map( ({original, preview, description}) => {
+  return `
+  <li class="gallery__item"><a class="gallery__link" href="${original}"><img class="gallery__image" src="${preview}" data-source="${original}" alt="${description}"/></a></li>`
+} ).join( '' );
 
-galleryItems.forEach(item => {
-  const galleryItemEl = document.createElement( 'li' );
-  galleryItemEl.classList.add( 'gallery__item' );
-  galleryItemEl.innerHTML = `<a class="gallery__link" href="${item.original}"><img class="gallery__image" src="${item.preview}" data-source="${item.original}" alt="${item.description}"/></a>`;
-  console.log( galleryItemEl );
-  galleryItemsArray.push( galleryItemEl );
-} );
-
-galleryEl.append( ...galleryItemsArray );
+galleryEl.insertAdjacentHTML( 'beforeend', galleryArray );
 
 galleryEl.addEventListener( 'click', onGalleryClick );
 
 function onGalleryClick(event) {
   event.preventDefault();
 
-  if ( event.target.className !== "gallery__image" ) {
+  if ( event.target.nodeName !== "IMG" ) {
     return;
   }
-  const instance = basicLightbox.create( `<div class="modal">
+
+  const html = `
+		<div class="modal">
     <img class="gallery__modal" src="${event.target.dataset.source}"/>
-    </div>` );
+    </div>
+	`
+  const instance = basicLightbox.create( html, {
+    onShow: ( instance ) => {
+      window.addEventListener( 'keydown', closeModalEsc );
+    },
+    onClose: ( instance ) => {
+      window.removeEventListener( 'keydown', closeModalEsc );
+    },
+      
+  } );
+
   instance.show();
     
   const galleryModalEl = document.querySelector( '.basicLightbox' );
@@ -36,7 +44,6 @@ function onGalleryClick(event) {
       return
     } else {
       instance.close();
-      window.removeEventListener( 'keydown', closeModalEsc );
     }
   };
 
